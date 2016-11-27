@@ -1,4 +1,8 @@
-﻿
+﻿using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Threading;
+using System.IO;
 
 namespace ConsoleApplication
 {
@@ -6,22 +10,48 @@ namespace ConsoleApplication
     {
         public static void Main(string[] args)
         {
+            System.Console.WriteLine("starting out");
             var d = new DataCollector();
-            d.GetData();
+
+            DataCollector.GetDataAsync();
+
         }
     }
 
     public class DataCollector
     {
-        public void GetData()
+        static string webAddress = "http://maps.googleapis.com/maps/api/staticmap?center=Chicago,IL&zoom=14&size=1200x1200&sensor=false";
+        HttpClient client;
+
+                public int counter { get; set; }
+        public DataCollector()
         {
-            var x = new Examplesx.System.Net.MyWebClient();
-            string x2 = string.Empty;
-            //x2 = await x.GetData();
-            x.GetData();
-            //var x2 = "adsfasdf";
-            System.Console.WriteLine(x2);
-            System.Console.WriteLine("here I am");
+            counter = 0;
+            client = new HttpClient();
+           
         }
+        public static async Task GetDataAsync()
+        {
+           try {
+               var client = new HttpClient();
+               var response = await client.GetAsync(webAddress);
+               response.EnsureSuccessStatusCode();
+
+               using (FileStream fileStream = new FileStream("e:\\img.png", FileMode.Create, FileAccess.Write, FileShare.None)) {
+                   await response.Content.CopyToAsync(fileStream);
+               }
+
+           }
+           catch (HttpRequestException hex) {
+               System.Console.WriteLine(hex.ToString());
+           }
+           catch (Exception ex) {
+               System.Console.WriteLine(ex.ToString());
+               throw;
+           }
+        
+        }
+
+       
     }
 }
