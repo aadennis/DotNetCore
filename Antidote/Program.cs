@@ -1,57 +1,34 @@
 ﻿using System;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Threading;
 using System.IO;
+using System.Net.Http;
 
-namespace ConsoleApplication
+//http://codesimplified.blogspot.co.uk/2013/11/asynchronous-file-download-from-web.html - thanks
+namespace ConsoleApplication1
 {
-    public class Program
+    class Program
     {
-        public static void Main(string[] args)
+
+        static async void getImage(string Location)
         {
-            System.Console.WriteLine("starting out");
-            var d = new DataCollector();
-
-            DataCollector.GetDataAsync();
-
-        }
-    }
-
-    public class DataCollector
-    {
-        static string webAddress = "http://maps.googleapis.com/maps/api/staticmap?center=Chicago,IL&zoom=14&size=1200x1200&sensor=false";
-        HttpClient client;
-
-                public int counter { get; set; }
-        public DataCollector()
-        {
-            counter = 0;
-            client = new HttpClient();
-           
-        }
-        public static async Task GetDataAsync()
-        {
-           try {
-               var client = new HttpClient();
-               var response = await client.GetAsync(webAddress);
-               response.EnsureSuccessStatusCode();
-
-               using (FileStream fileStream = new FileStream("e:\\img.png", FileMode.Create, FileAccess.Write, FileShare.None)) {
-                   await response.Content.CopyToAsync(fileStream);
-               }
-
-           }
-           catch (HttpRequestException hex) {
-               System.Console.WriteLine(hex.ToString());
-           }
-           catch (Exception ex) {
-               System.Console.WriteLine(ex.ToString());
-               throw;
-           }
+            string webAddress = string.Format("http://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=17&size=1200x1200&sensor=false", Location);
         
+            HttpClient client = new HttpClient();
+            HttpResponseMessage response = await client.GetAsync(webAddress);
+            response.EnsureSuccessStatusCode();
+
+
+            using (FileStream fileStream = new FileStream(string.Format("e:\\{0}.png",Location), FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                await response.Content.CopyToAsync(fileStream);
+            }
         }
 
-       
+        static void Main(string[] args)
+        {
+            getImage("Bracknell");
+
+            Console.WriteLine("Hit  enter to exit...");
+            Console.ReadLine();
+        }
     }
 }
