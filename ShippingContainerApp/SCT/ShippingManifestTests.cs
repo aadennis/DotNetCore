@@ -15,7 +15,7 @@ namespace ShippingContainerApp
         [Fact]
         public void ThingGetsObjectValFromNumber()
         {
-            Assert.Equal(423, new ShippingManifest().GetNumber(42));
+            Assert.Equal(42, new ShippingManifest().GetNumber(42));
         }
     }
 }
